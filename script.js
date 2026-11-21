@@ -118,8 +118,8 @@
   // Nothing is sent from this page: the enquiry is handed to the visitor's own
   // email app (mailto) or WhatsApp, and they choose whether to send it.
   (() => {
-    const ENQ_EMAIL = 'harishjangid0005@gmail.com';
-    const ENQ_WHATSAPP = '917073750190';
+    const ENQ_EMAIL = 'hello@bellenbeast.com';
+    const ENQ_WHATSAPP = '971541272900';
     const enq = q('#enquiry-form');
     if (!enq) return;
     const success = q('#enquiry-success');
@@ -274,6 +274,15 @@
       if (opts.city) q('#bnm-ecity').value = opts.city;
       openModal(trigger);
     };
+    // Discipline cards: open the popup with that card's category pre-selected.
+    qa('.category-action[data-category]').forEach(btn => btn.addEventListener('click', () => {
+      const radio = q(`input[name="category"][value="${btn.dataset.category}"]`, mform);
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      openModal(btn);
+    }));
     if (location.hash === '#apply') openModal(null);
     qa('[data-bnm-close]', modal).forEach(btn => btn.addEventListener('click', closeModal));
     document.addEventListener('keydown', (e) => {
