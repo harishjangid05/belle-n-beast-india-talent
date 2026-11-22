@@ -380,3 +380,16 @@ body.bnm-printing .bnm-popper,body.bnm-printing .bnm-confetti{display:none!impor
   .hero-meta span{font-size:9px}
   .benefit-grid small{font-size:12.5px}
 }
+
+/* Top strip: scrolling marquee on mobile */
+.strip-marquee{display:none}
+@media(max-width:690px){
+  .top-strip .strip-inner{display:none}
+  .strip-marquee{display:block;overflow:hidden;height:34px;color:#f2e8d4}
+  .strip-marquee__track{display:flex;width:max-content;height:100%;align-items:center;animation:stripMarquee 22s linear infinite}
+  .strip-marquee__item{display:inline-flex;align-items:center;white-space:pre;font-size:10px;letter-spacing:.15em}
+  .strip-marquee__item .live-dot{margin-right:10px}
+  .strip-marquee__item i{font-style:normal;color:var(--gold);margin:0 16px}
+}
+@keyframes stripMarquee{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.strip-marquee__track{animation:none}}
