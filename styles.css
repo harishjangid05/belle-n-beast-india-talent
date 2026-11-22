@@ -251,3 +251,31 @@ body.bnm-lock{overflow:hidden}
 .dpay.is-busy .dpay__pay,.dpay.is-busy .dpay__fail,.dpay.is-busy .dpay__methods{pointer-events:none}
 .dpay.is-busy .dpay__pay{opacity:.85}
 .dpay__foot{padding:12px 20px 16px;font-size:11px;color:#99a;text-align:center;border-top:1px solid #eceef3}
+
+/* Hero: faint Dubai skyline behind the content to fill the empty space */
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1800&q=70') 30% 60%/cover no-repeat;opacity:.2;filter:grayscale(1) sepia(.45) brightness(.9);-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.55) 0%,#000 35%,#000 60%,rgba(0,0,0,.25) 100%);mask-image:linear-gradient(90deg,rgba(0,0,0,.55) 0%,#000 35%,#000 60%,rgba(0,0,0,.25) 100%)}
+.hero-scroll{position:relative;z-index:1}
+
+/* Payment success: highlighted status badge, animated check and party poppers */
+.bnm-celebrate{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px}
+.bnm-done .bnm-done__mark{margin:0;background:#2f6b3a;color:#fff;position:relative;box-shadow:0 0 0 0 rgba(47,107,58,.45)}
+.bnm-popper{font-size:34px;line-height:1;display:inline-block;opacity:0}
+.bnm-popper--r{transform:scaleX(-1)}
+.bnm-done .bnm-done__badge{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#e7f2e9;border:1px solid rgba(47,107,58,.35);color:#2f6b3a;font-weight:700;font-size:11.5px;letter-spacing:.14em;line-height:1.4}
+.bnm-done .bnm-done__badge::before{content:"✓";font-size:13px;letter-spacing:0}
+.bnm-done .bnm-done__badge.is-test{background:#f6eedf;border-color:rgba(155,122,69,.4);color:#7a5c2e}
+.bnm-done h3{font-size:clamp(36px,4.6vw,54px)}
+.bnm-done.is-celebrating .bnm-done__mark{animation:bnmMarkPop .7s cubic-bezier(.22,1.4,.36,1) both,bnmPulse 1.8s ease-out .6s 2}
+.bnm-done.is-celebrating .bnm-popper--l{animation:bnmPopL .9s cubic-bezier(.22,1.4,.36,1) .15s both}
+.bnm-done.is-celebrating .bnm-popper--r{animation:bnmPopR .9s cubic-bezier(.22,1.4,.36,1) .15s both}
+.bnm-done:not(.is-celebrating) .bnm-popper{opacity:1}
+.bnm-done.is-celebrating .bnm-done__badge{animation:bnmIn .7s var(--enq-ease) .35s both}
+.bnm-done.is-celebrating .bnm-regid{animation:bnmIn .7s var(--enq-ease) .5s both,bnmGlow 2.4s ease-out 1s 1}
+@keyframes bnmMarkPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes bnmPulse{0%{box-shadow:0 0 0 0 rgba(47,107,58,.45)}100%{box-shadow:0 0 0 22px rgba(47,107,58,0)}}
+@keyframes bnmPopL{0%{opacity:0;transform:translate(24px,10px) rotate(30deg) scale(.3)}60%{opacity:1;transform:translate(-4px,-6px) rotate(-12deg) scale(1.2)}100%{opacity:1;transform:none}}
+@keyframes bnmPopR{0%{opacity:0;transform:scaleX(-1) translate(24px,10px) rotate(30deg) scale(.3)}60%{opacity:1;transform:scaleX(-1) translate(-4px,-6px) rotate(-12deg) scale(1.2)}100%{opacity:1;transform:scaleX(-1)}}
+@keyframes bnmGlow{0%{box-shadow:0 0 0 0 rgba(198,163,107,.55)}100%{box-shadow:0 0 0 18px rgba(198,163,107,0)}}
+.bnm-confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+@media(prefers-reduced-motion:reduce){.bnm-done.is-celebrating *{animation:none!important}.bnm-popper{opacity:1}}
+body.bnm-printing .bnm-popper,body.bnm-printing .bnm-confetti{display:none!important}

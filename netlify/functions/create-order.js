@@ -4,7 +4,7 @@
 const { FEE_PAISE, CURRENCY, CATEGORY_NAMES, keys, razorpay, registrationId, clip, json } = require('../lib/razorpay');
 
 const CITIES = ['Mumbai','Delhi','Bengaluru','Hyderabad','Chennai','Kolkata','Pune','Ahmedabad','Jaipur','Chandigarh','Lucknow','Indore','Surat','Bhopal','Kochi','Panaji','Nagpur','Guwahati','Bhubaneswar','Coimbatore'];
-const DATES = ['2027-01-01','2027-01-02','2027-01-03','2027-01-04','2027-01-05','2027-01-06','2027-01-07'];
+const DATES = ['2027-01-18','2027-01-19','2027-01-20','2027-01-21','2027-01-22','2027-01-23','2027-01-24','2027-01-25'];
 const TIMES = ['morning','afternoon','evening'];
 
 exports.handler = async (event) => {
@@ -40,7 +40,7 @@ exports.handler = async (event) => {
           email: clip(a.email, 120),
           phone: clip(a.phone, 20),
           category: CATEGORY_NAMES[a.category],
-          dob: clip(a.dob, 10),
+          dob: clip(a.dob, 10).replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$3/$2/$1'), // DD/MM/YYYY
           current_location: clip(`${a.currentCity || ''}, ${a.state || ''}`, 160),
           passport: clip(a.passport, 20),
           experience: clip(a.experience, 20),

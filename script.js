@@ -57,7 +57,7 @@
     const title = document.createElement('strong');
     title.textContent = name;
     const sub = document.createElement('small');
-    sub.textContent = `${state} · Venue TBD · Jan 01–07`;
+    sub.textContent = `${state} · Venue TBD · Jan 18–25`;
     tile.append(n,title,sub);
     tile.setAttribute('aria-label',`Choose ${name} as your preferred audition city`);
     tile.addEventListener('click', () => {
@@ -237,7 +237,7 @@
     const backBtn = q('#bnm-back');
     const nextLabel = q('#bnm-next-label');
     const done = q('#bnm-done');
-    const EVENT_LAST = '2027-01-07';
+    const EVENT_LAST = '2027-01-25';
     const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let step = 1;
     let lastTrigger = null;
@@ -414,6 +414,21 @@
       field.classList.remove('is-invalid');
       q(':scope > .enq-field__error', field)?.remove();
     }
+    // Dates are shown and typed as DD/MM/YYYY; internally they stay YYYY-MM-DD.
+    const ddmmyyyy = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || ''); };
+    function dobISO() {
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(mform.elements.dob.value.trim());
+      if (!m) return '';
+      const iso = `${m[3]}-${m[2]}-${m[1]}`;
+      const d = new Date(iso + 'T12:00:00');
+      return !Number.isNaN(d.getTime()) && d.getDate() === +m[1] && d.getMonth() + 1 === +m[2] && +m[3] >= 1900 ? iso : '';
+    }
+    // Auto-insert the slashes while typing the date of birth.
+    mform.elements.dob.addEventListener('input', (e) => {
+      if (e.inputType && e.inputType.startsWith('delete')) return;
+      const dg = e.target.value.replace(/\D/g, '').slice(0, 8);
+      e.target.value = dg.length > 4 ? `${dg.slice(0, 2)}/${dg.slice(2, 4)}/${dg.slice(4)}` : dg.length > 2 ? `${dg.slice(0, 2)}/${dg.slice(2)}` : dg;
+    });
     function ageOn(birth, date) {
       const b = new Date(birth + 'T12:00:00'), d = new Date(date + 'T12:00:00');
       if (Number.isNaN(b.getTime()) || Number.isNaN(d.getTime())) return -1;
@@ -450,12 +465,13 @@
       if (n === 1) {
         const digits = el.phone.value.replace(/\D/g, '').length;
         if (el.phone.value.trim() && (digits < 10 || digits > 15)) fail(el.phone, 'Enter a valid mobile / WhatsApp number (10–15 digits).');
-        if (el.dob.value && ageOn(el.dob.value, EVENT_LAST) < 21) fail(el.dob, 'Applicants must be at least 21 years old by 7 January 2027.');
+        if (el.dob.value.trim() && !dobISO()) fail(el.dob, 'Enter your date of birth as DD/MM/YYYY.');
+        else if (el.dob.value.trim() && ageOn(dobISO(), EVENT_LAST) < 21) fail(el.dob, 'Applicants must be at least 21 years old by 25/01/2027.');
       }
       if (n === 2 && drop.closest('.enq-field').classList.contains('is-invalid')) bad.push(drop.closest('.enq-field'));
       if (n === 3) {
         const d = radioVal('eventDate');
-        if (d && ageOn(el.dob.value, d) < 21) fail(q('[data-group="eventDate"]', container), 'You must be 21 on your chosen audition date. Please choose a later date.');
+        if (d && ageOn(dobISO(), d) < 21) fail(q('[data-group="eventDate"]', container), 'You must be 21 on your chosen audition date. Please choose a later date.');
       }
 
       if (bad.length) {
@@ -480,8 +496,8 @@
 
     // ---- review ----
     function prettyDate(v) {
-      if (!/^2027-01-0[1-7]$/.test(v)) return v || 'Not selected';
-      return new Date(`${v}T12:00:00`).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      if (!/^2027-01-(1[89]|2[0-5])$/.test(v)) return v || 'Not selected';
+      return `${new Date(`${v}T12:00:00`).toLocaleDateString('en-IN', { weekday: 'long' })}, ${ddmmyyyy(v)}`;
     }
     const TIME = { morning: 'Morning (exact time TBD)', afternoon: 'Afternoon (exact time TBD)', evening: 'Evening (exact time TBD)' };
     const optText = (sel) => sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : '—';
@@ -499,7 +515,7 @@
       row(dl, 'Category', CATEGORY_NAMES[radioVal('category')]);
       row(dl, 'Email', el.email.value.trim());
       row(dl, 'WhatsApp', el.phone.value.trim());
-      row(dl, 'Date of birth', el.dob.value ? new Date(el.dob.value + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
+      row(dl, 'Date of birth', ddmmyyyy(dobISO()));
       row(dl, 'Current location', [el.currentCity.value.trim(), el.state.value].filter(Boolean).join(', '));
       row(dl, 'Passport', optText(el.passport));
       row(dl, 'Experience', optText(el.experience));
@@ -582,7 +598,7 @@
       const el = mform.elements;
       const data = {
         category: radioVal('category'), fullName: el.fullName.value.trim(), email: el.email.value.trim(),
-        phone: el.phone.value.trim(), dob: el.dob.value, currentCity: el.currentCity.value.trim(), state: el.state.value,
+        phone: el.phone.value.trim(), dob: dobISO(), currentCity: el.currentCity.value.trim(), state: el.state.value,
         passport: el.passport.value, experience: el.experience.value, relocation: el.relocation.value,
         portfolioUrl: el.portfolioUrl.value.trim(), eventCity: el.eventCity.value,
         eventDate: radioVal('eventDate'), timePreference: radioVal('timePreference')
@@ -707,7 +723,7 @@
           try {
             const result = DEMO ? await demoVerify(resp, order, app) : await api('verify-payment', resp);
             if (!result.verified) throw new Error(result.error || 'Payment could not be verified.');
-            showConfirmation(result, app);
+            showConfirmation(result, app, true);
           } catch (err) {
             setBusy(false);
             payError(`${err.message} If money was deducted, contact us with payment ID ${resp.razorpay_payment_id} — do not pay again.`);
@@ -723,7 +739,50 @@
     }
 
     const STORE_KEY = 'bnb-ith27-registration';
-    function showConfirmation(r, app) {
+    // Party-popper confetti burst over the popup (skipped for reduced motion).
+    function celebrate() {
+      done.classList.remove('is-celebrating'); void done.offsetWidth; done.classList.add('is-celebrating');
+      if (reduced()) return;
+      const cv = document.createElement('canvas');
+      cv.className = 'bnm-confetti'; cv.setAttribute('aria-hidden', 'true');
+      modal.append(cv);
+      const ctx = cv.getContext('2d');
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+      const COLORS = ['#c6a36b', '#e6c99a', '#9b7a45', '#2f6b3a', '#ffffff', '#d4574a', '#f3e2b8'];
+      const box = panel.getBoundingClientRect();
+      const bits = [];
+      const burst = (x, y, dir) => {
+        for (let i = 0; i < 90; i++) {
+          const a = (-90 + dir * (15 + Math.random() * 55)) * Math.PI / 180;
+          const v = (9 + Math.random() * 11) * dpr;
+          bits.push({ x: x * dpr, y: y * dpr, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+            w: (5 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr,
+            r: Math.random() * 6, vr: (Math.random() - .5) * .35, c: COLORS[i % COLORS.length],
+            round: Math.random() < .3, life: 0 });
+        }
+      };
+      const y0 = Math.min(box.top + 120, innerHeight * .45);
+      burst(box.left + 40, y0, 1);
+      burst(box.right - 40, y0, -1);
+      setTimeout(() => burst(innerWidth / 2, Math.max(box.top, 0) + 40, 0), 350);
+      const t0 = performance.now();
+      (function frame(t) {
+        ctx.clearRect(0, 0, W, H);
+        for (const b of bits) {
+          b.life++; b.vy += .32 * dpr; b.vx *= .985; b.vy *= .985;
+          b.x += b.vx; b.y += b.vy; b.r += b.vr;
+          ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+          ctx.globalAlpha = Math.max(0, 1 - (t - t0) / 4200);
+          ctx.fillStyle = b.c;
+          if (b.round) { ctx.beginPath(); ctx.arc(0, 0, b.w / 2, 0, 7); ctx.fill(); }
+          else ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h * Math.abs(Math.cos(b.life / 6)));
+          ctx.restore();
+        }
+        if (t - t0 < 4200) requestAnimationFrame(frame); else cv.remove();
+      })(t0);
+    }
+    function showConfirmation(r, app, fresh = false) {
       paying = false;
       nextBtn.classList.remove('is-busy');
       nextBtn.disabled = false; backBtn.disabled = false;
@@ -741,7 +800,9 @@
       st.innerHTML = r.test
         ? '<dt>Status</dt><dd class="is-flag">Test payment · no money charged</dd>'
         : '<dt>Status</dt><dd class="is-ok">Paid · Registered</dd>';
-      q('#bnm-done .bnm-eyebrow').textContent = r.test ? 'Test payment successful · Registration submitted' : 'Payment successful · Registration confirmed';
+      const badge = q('#bnm-done .bnm-eyebrow');
+      badge.textContent = r.test ? 'Test payment successful · Registration submitted' : 'Payment successful · Registration confirmed';
+      badge.classList.toggle('is-test', !!r.test);
       sum.append(st);
       mform.hidden = true;
       head.hidden = true;
@@ -749,6 +810,7 @@
       done.hidden = false;
       paintStepper(5);
       panel.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' });
+      if (fresh) setTimeout(celebrate, 250);
       try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...r, savedAt: Date.now() })); } catch {}
     }
     // Reopening the popup after paying (even after a reload) shows the confirmation again.
