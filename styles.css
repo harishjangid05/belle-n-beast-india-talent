@@ -279,3 +279,11 @@ body.bnm-lock{overflow:hidden}
 .bnm-confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
 @media(prefers-reduced-motion:reduce){.bnm-done.is-celebrating *{animation:none!important}.bnm-popper{opacity:1}}
 body.bnm-printing .bnm-popper,body.bnm-printing .bnm-confetti{display:none!important}
+
+/* Date of birth: typed DD/MM/YYYY field with a calendar button */
+.bnm-date{position:relative}
+.bnm-date>input[type=text]{padding-right:44px}
+.bnm-date__btn{position:absolute;right:0;top:50%;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;cursor:pointer;transition:background .2s}
+.bnm-date__btn:hover,.bnm-date__btn:focus-visible{background:rgba(155,122,69,.12)}
+.bnm-date__btn .enq-i{width:20px;height:20px}
+.bnm-date__picker{position:absolute;right:0;bottom:0;width:40px!important;height:40px!important;min-height:0!important;padding:0!important;opacity:0;pointer-events:none;border:0!important}

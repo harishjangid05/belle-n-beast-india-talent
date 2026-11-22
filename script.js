@@ -429,6 +429,19 @@
       const dg = e.target.value.replace(/\D/g, '').slice(0, 8);
       e.target.value = dg.length > 4 ? `${dg.slice(0, 2)}/${dg.slice(2, 4)}/${dg.slice(4)}` : dg.length > 2 ? `${dg.slice(0, 2)}/${dg.slice(2)}` : dg;
     });
+    // Calendar button: opens the device's date picker and fills the field as DD/MM/YYYY.
+    const dobPicker = q('#bnm-dob-picker');
+    q('#bnm-dob-btn').addEventListener('click', () => {
+      dobPicker.value = dobISO() || '2000-01-01';
+      try { dobPicker.showPicker(); } catch { dobPicker.focus(); dobPicker.click(); }
+    });
+    dobPicker.addEventListener('change', () => {
+      if (!dobPicker.value) return;
+      const field = mform.elements.dob;
+      field.value = ddmmyyyy(dobPicker.value);
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+      field.focus({ preventScroll: true });
+    });
     function ageOn(birth, date) {
       const b = new Date(birth + 'T12:00:00'), d = new Date(date + 'T12:00:00');
       if (Number.isNaN(b.getTime()) || Number.isNaN(d.getTime())) return -1;
